@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Inventario - Requerimientos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #3730a3;
+            --secondary: #6b7280;
+            --danger: #dc2626;
+            --success: #059669;
+            --warning: #d97706;
+            --bg-gradient: linear-gradient(135deg, #1e1b4b 0%, #312e81 50
+            %, #4c1d95 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+        }
+
+        h1 { 
+            color: #1e293b; 
+            font-size: 2.5rem; 
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            font-weight: 700;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-layout { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--success), var(--warning));
+            border-radius: 20px 20px 0 0;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .input-group { margin-bottom: 15px; }
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            color: #374151;
+        }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
+            font-size: 1rem;
+        }
+        input:focus { 
+            border-color: var(--primary); 
+            outline: none; 
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+            background: rgba(255, 255, 255, 1);
+        }
+        input::placeholder { color: #9ca3af; }
+
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover)); 
+            color: white; 
+            border: none; 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            margin-bottom: 10px; 
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+        }
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+        }
+        .btn-secondary { 
+            background: rgba(255, 255, 255, 0.9); 
+            color: #1e293b; 
+            border: 2px solid var(--border); 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover { 
+            background: rgba(255, 255, 255, 1); 
+            border-color: var(--primary);
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .search-container { position: relative; flex: 1; }
+        .search-container i { position: absolute; left: 10px; top: 14px; color: #9ca3af; }
+        .search-container input { padding-left: 35px; }
+
+        .table-container { 
+            overflow-x: auto; 
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 10px;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 10px; 
+            background: transparent;
+        }
+        th { 
+            text-align: left; 
+            background: rgba(255, 255, 255, 0.9); 
+            padding: 15px; 
+            border-bottom: 2px solid var(--border); 
+            color: #1e293b;
+            font-weight: 600;
+        }
+        td { 
+            padding: 15px; 
+            border-bottom: 1px solid var(--border); 
+            color: #1e293b;
+            transition: background 0.2s ease;
+        }
+        tr:hover td { background: rgba(0, 0, 0, 0.05); }
+
+        .actions { display: flex; gap: 10px; }
+        .btn-action { 
+            border: none; 
+            background: rgba(255, 255, 255, 0.9); 
+            cursor: pointer; 
+            font-size: 1.1rem; 
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            color: #1e293b;
+        }
+        .btn-action:hover { 
+            background: rgba(255, 255, 255, 1); 
+            transform: scale(1.1);
+        }
+        .edit:hover { color: var(--success); }
+        .delete:hover { color: var(--danger); }
+
+        .empty-state { 
+            text-align: center; 
+            padding: 50px; 
+            color: #1e293b; 
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            border: 2px dashed var(--border);
+        }
+        .empty-state i { 
+            font-size: 3rem; 
+            color: #64748b; 
+            margin-bottom: 15px;
+        }
+        .hidden { display: none; }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px) translateX(20px);
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 300px;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0) translateX(0);
+        }
+        .toast.success { 
+            background: linear-gradient(135deg, var(--success), #10b981); 
+            border-color: var(--success);
+        }
+        .toast.error { 
+            background: linear-gradient(135deg, var(--danger), #dc2626); 
+            border-color: var(--danger);
+        }
+        .toast.warning { 
+            background: linear-gradient(135deg, var(--warning), #d97706); 
+            border-color: var(--warning);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-store"></i> Control de Inventario</h1>
+        </header>
+
+        <div class="grid-layout">
+            <section class="card">
+                <h2 id="form-title" style="color: #1e293b; margin-bottom: 20px; font-size: 1.5rem;">Registrar Producto</h2>
+                <form id="inventory-form">
+                    <input type="hidden" id="prod-id">
+                    
+                    <div class="input-group">
+                        <label>Código del Producto</label>
+                        <input type="number" id="prod-code" placeholder="Ej: 001" min="1">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Nombre del Producto</label>
+                        <input type="text" id="prod-name" placeholder="Ej: Bermuda Deportiva">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Precio Unitario ($)</label>
+                        <input type="number" step="0.01" id="prod-price" placeholder="0.00">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Cantidad Inicial</label>
+                        <input type="number" id="prod-stock" placeholder="0">
+                    </div>
+
+                    <button type="submit" id="btn-save" class="btn-primary">Guardar Producto</button>
+                    <button type="button" id="btn-cancel" class="btn-secondary hidden">Cancelar Edición</button>
+                </form>
+            </section>
+
+            <section class="card">
+                <div class="list-header">
+                    <h2 style="color: #1e293b; margin-bottom: 20px; font-size: 1.5rem;">Productos</h2>
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-input" placeholder="Filtrar por nombre del producto...">
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Producto</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body">
+                            </tbody>
+                    </table>
+                    <div id="no-data" class="empty-state hidden">
+                        <i class="fas fa-box-open fa-2x"></i>
+                        <p id="empty-msg">¡No hay productos registrados!</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+
+        const form = document.getElementById('inventory-form');
+        const tableBody = document.getElementById('inventory-table-body');
+        const searchInput = document.getElementById('search-input');
+        const emptyState = document.getElementById('no-data');
+        const emptyMsg = document.getElementById('empty-msg');
+        const btnCancel = document.getElementById('btn-cancel');
+        const formTitle = document.getElementById('form-title');
+        const btnSave = document.getElementById('btn-save');
+
+        let inventory = JSON.parse(localStorage.getItem('my_inventory')) || [];
+        let isEditing = false;
+
+        function loadInventory(filterText = "") {
+            tableBody.innerHTML = "";
+            
+            const filteredData = inventory.filter(item => 
+                item.name.toLowerCase().includes(filterText.toLowerCase()) ||
+                (item.code && item.code.toString().includes(filterText))
+            );
+
+            if (filteredData.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyMsg.innerText = filterText ? "No se encontraron productos con ese criterio" : "¡No hay productos registrados!";
+            } else {
+                emptyState.classList.add('hidden');
+                filteredData.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.code || 'N/A'}</td>
+                        <td>${item.name}</td>
+                        <td>$${parseFloat(item.price).toFixed(2)}</td>
+                        <td>${item.cantidad} unidades</td>
+                        <td class="actions">
+                            <button class="btn-action edit" onclick="startEdit('${item.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-action delete" onclick="removeProduct('${item.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        }
+
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const id = document.getElementById('prod-id').value;
+            const code = parseInt(document.getElementById('prod-code').value);
+            const name = document.getElementById('prod-name').value.trim();
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const cantidad = parseInt(document.getElementById('prod-stock').value);
+
+            if (isNaN(code) || code <= 0) {
+                alert("Código debe ser un número positivo");
+                return;
+            }
+            if (!name) {
+                alert("Nombre obligatorio");
+                return;
+            }
+            if (isNaN(price) || price <= 0) {
+                alert("Precio debe ser número positivo");
+                return;
+            }
+            if (isNaN(cantidad) || cantidad < 0) {
+                alert("Cantidad debe ser entero");
+                return;
+            }
+
+            const existingProduct = inventory.find(item => item.code === code && item.id !== id);
+            if (existingProduct) {
+                alert("Error: El código ya pertenece a otro producto");
+                return;
+            }
+
+            if (isEditing) {
+
+                inventory = inventory.map(item => 
+                    item.id === id ? { id, code, name, price, cantidad } : item
+                );
+                alert("Producto actualizado correctamente");
+            } else {
+
+                const newItem = {
+                    id: Date.now().toString(),
+                    code,
+                    name,
+                    price,
+                    cantidad
+                };
+                inventory.push(newItem);
+                alert("Producto ingresado correctamente");
+            }
+
+            syncStorage();
+            resetForm();
+        });
+
+        window.removeProduct = (id) => {
+            const item = inventory.find(i => i.id === id);
+            if (item && confirm(`¿Está seguro de eliminar el producto con Código: ${item.code || 'N/A'} - ${item.name}?`)) {
+                inventory = inventory.filter(item => item.id !== id);
+                syncStorage();
+                showToast("Producto eliminado correctamente");
+            }
+        };
+
+
+        window.startEdit = (id) => {
+            const item = inventory.find(i => i.id === id);
+            if (item) {
+                document.getElementById('prod-id').value = item.id;
+                document.getElementById('prod-code').value = item.code || '';
+                document.getElementById('prod-name').value = item.name;
+                document.getElementById('prod-price').value = item.price;
+                document.getElementById('prod-stock').value = item.cantidad;
+
+                isEditing = true;
+                formTitle.innerText = "Actualizar Producto";
+                btnSave.innerText = "Actualizar";
+                btnCancel.classList.remove('hidden');
+            }
+        };
+
+
+        searchInput.addEventListener('input', (e) => {
+            loadInventory(e.target.value);
+        });
+
+
+        function syncStorage() {
+            localStorage.setItem('my_inventory', JSON.stringify(inventory));
+            loadInventory();
+        }
+
+        function resetForm() {
+            form.reset();
+            isEditing = false;
+            formTitle.innerText = "Registrar Producto";
+            btnSave.innerText = "Guardar Producto";
+            btnCancel.classList.add('hidden');
+            document.getElementById('prod-id').value = "";
+        }
+
+        btnCancel.addEventListener('click', resetForm);
+
+        loadInventory();
+    </script>
+</body>
+</html>
